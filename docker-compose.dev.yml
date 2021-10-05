@@ -1,0 +1,71 @@
+version: "3.9"  
+services:
+  orchestrator:
+    build: .
+    networks:
+      - backend
+    volumes:
+      - .:/app
+    command: npm run start:dev
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+  redis:
+    image: redislabs/redismod
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+  atom-http:
+    build: ../atom-http
+    volumes:
+      - ../atom-http:/app
+    networks:
+      - backend
+    command: npm run start:dev
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+  atom-email:
+    build: ../atom-email
+    volumes:
+      - ../atom-email:/app
+    command: npm run start:dev
+    networks:
+      - backend
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+  atom-db:
+    build: ../atom-db
+    volumes:
+      - ../atom-db:/app
+    command: npm run start:dev
+    networks:
+      - backend
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+  transport-ws:
+    build: ../transport-ws
+    volumes:
+      - ../transport-ws:/app
+    command: npm run start:dev
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+  ui:
+    build: ../ui
+    command: npm run start:dev
+    volumes:
+      - ../ui:/app
+    ports:
+      - 80:80
+    networks:
+      - backend
+networks:
+  backend:
